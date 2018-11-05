@@ -1,10 +1,10 @@
 class PostsController < ApplicationController
-    before_action :authenticate_user,  only: [:index]
+    #before_action :authenticate_user,  only: [:index]
     before_action :set_post, only: [:show, :update, :destroy]
 
     def index
-        @posts = Post.all.order("posts.title")
-        render json: @posts
+        @posts = Post.all
+        render json: @posts,  include: 'articles'
     end
 
     def show
@@ -14,7 +14,7 @@ class PostsController < ApplicationController
     def create
         
         @post = Post.new(post_params)
-    
+        #@post.articles.build
         if @post.save
           render json: @post, status: :created, location: @post
         else
@@ -41,7 +41,9 @@ class PostsController < ApplicationController
         end
 
         def post_params
-            params.require(:post).permit(:id, :title, :description)
+            params.require(:post).permit(:id, :title, :description,
+                articles_attributes:[:id,:_destroy,:information]
+            )
         end
         
         def authorize
